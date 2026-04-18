@@ -1,3 +1,84 @@
+# Go Web Crawler
+
+A concurrent, multi-worker web crawler written in Go, designed to efficiently traverse websites by fetching and parsing HTML pages. It features configurable depth limits, domain restrictions, and a robust worker pool pattern to handle network operations concurrently.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [How It Works](#how-it-works)
+- [Getting Started](#getting-started)
+- [Configuration](#configuration)
+- [Features](#features)
+- [Current Limitations](#current-limitations)
+- [Future Goals & Enhancements](#future-goals--enhancements)
+
+## Overview
+
+This project implements a web crawler that uses a pool of worker goroutines to process URLs concurrently. The main components include:
+- A **Scheduler** to prevent duplicate work and enforce crawling rules.
+- A **Fetcher** to handle HTTP requests with timeouts and content validation.
+- A **Parser** to extract links from HTML documents.
+- A **Worker Pool** to manage concurrent execution.
+
+The crawler is designed to be simple, efficient, and easily extensible.
+
+## Architecture
+
+The crawler operates on a classic worker pool model. A central `main` function orchestrates the work by distributing `URLTask` items through a shared channel to a pool of worker goroutines.
+
+```
+┌──────────────────────────┐
+│           Main           │
+│  - Creates Scheduler     │
+│  - Spawns Worker Pool    │
+│  - Seeds Initial URL     │
+└────────────┬─────────────┘
+             │
+     ┌───────▼─────────┐
+     │   Tasks Channel │
+     │ (models.URLTask)│
+     └───────┬─────────┘
+             │
+  ┌──────────┼──────────┬──────────┐
+  │          │          │          │
+  ▼          ▼          ▼          ▼
+┌───────┐ ┌───────┐ ┌───────┐ ┌───────┐
+│Worker1│ │Worker2│ │...    │ │WorkerN│
+└─┬─────┘ └─┬─────┘ └─┬─────┘ └─┬─────┘
+  │         │         │         │
+  └─────────┼─────────┼─────────┘
+            │
+    ┌───────▼────────────┐
+    │  Processing Loop:  │
+    │ 1. Check & Mark URL│
+    │ 2. Fetch HTML      │
+    │ 3. Parse for Links │
+    │ 4. Add New Tasks   │
+    └────────────────────┘
+```
+
+## Project Structure
+
+```
+.
+├── cmd/server/main.go      # Main application entry point and worker logic
+├── internal/
+│   ├── crawler/
+│   │   ├── crawler.go      # (Placeholder)
+│   │   └── scheduler.go    # URL validation and duplicate prevention
+│   ├── fetcher/
+│   │   └── fetcher.go      # HTTP client for fetching HTML
+│   ├── frontier/
+│   │   └── queue.go        # A thread-safe queue for URLs
+│   ├── models/
+│   │   └── types.go        # Core data structures (URLTask, Config)
+│   └── parser/
+│       └── parser.go       # HTML parsing and link extraction
+├── go.mod
+└── README.md
+```
 
 ## How It Works
 

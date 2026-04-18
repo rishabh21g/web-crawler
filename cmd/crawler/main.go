@@ -12,7 +12,7 @@ func main() {
 	const WORKERS = 10
 
 	var wg sync.WaitGroup
-	tasks := make(chan models.URLTask, 10)
+	tasks := make(chan models.URLTask, 100)
 
 	startURL := "https://books.toscrape.com"
 

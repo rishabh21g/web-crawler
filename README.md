@@ -72,3 +72,7 @@ From repo root:
 ```bash
 go run ./cmd/crawler
 ```
+
+## Sample Output
+
+<img src="images/worker_log.png" alt="Crawler run output" width="900" />
